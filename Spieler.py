@@ -2,8 +2,7 @@ import random
 
 
 
-karten_eines_deckes = (2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11)
-alle_karten = (2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, )
+
 
 
 class Spieler:
@@ -29,11 +28,11 @@ class Spieler:
 
     def erhoehen(self):
         return "Fehler"
-
+    #Überprüft ob gesammt kartenwert grösser als 21
     def ausgeschieden(self):
         return self.gesammt_wert > 21
 
-
+    #sein Gewinnn wird ihm ausgezahlt
     def bekomme_geld(self, gewinn):
         self.geld = self.geld + gewinn
 
@@ -48,6 +47,16 @@ class Spieler:
             return True
         else:
             return False
+
+    def dealer_bekommt_karte(self):
+        return "Fehler"
+
+    def pleite(self):
+        return "Fehler"
+
+
+
+
 
 class Konsolenspieler(Spieler):
 
@@ -109,5 +118,41 @@ class Konsolenspieler(Spieler):
 
         super().bekomme_geld(gewinn)
         print("Sie haben " + gewinn + " erhalten. Ihr neues Total ist " + self.geld)
+
+    def dealer_bekommt_karte(self, dealer_wert):
+
+        self.kartenwert_bankier = dealer_wert
+        print("Der Dealer hat eine " + self.kartenwert_bankier)
+
+    def pleite(self):
+        print("Sie haben kein Geld mehr und sind somit ausgeschieden.")
+
+
+
+
+class Dealer(Spieler):
+
+
+    def neues_spiel(self, start_einsatz):
+
+        self.gesammt_wert = 0
+
+        self.verloren = False
+
+    def bekomme_karte(self, wert):
+
+        self.gesammt_wert = self.gesammt_wert + wert
+
+    def weitere_karte(self):
+
+        if self.gesammt_wert < 17:
+            return True
+        else:
+            return False
+
+    def erhoehen(self):
+        print("Fehler: Dealer hat keinen Einsatz")
+
+
 
 
