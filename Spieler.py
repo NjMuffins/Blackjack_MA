@@ -17,6 +17,11 @@ class Spieler:
 
     kartenwert_bankier = 0
 
+    def __init__(self, geld):
+        self.geld = geld
+
+
+
     def neues_spiel(self, start_einsatz):
         return "Fehler"
 
@@ -66,6 +71,8 @@ class Konsolenspieler(Spieler):
 
         self.verloren = False
 
+        self.einsatz_momentan = 0
+
         self.kartenwert_bankier = 0
 
         hat_genug_geld = self.geld_setzen(start_einsatz)
@@ -74,11 +81,11 @@ class Konsolenspieler(Spieler):
 
     def bekomme_karte(self, wert):
 
-        print("Sie haben eine " + wert + " bekommen")
+        print("Sie haben eine " + str(wert) + " bekommen")
 
         self.gesammt_wert = self.gesammt_wert + wert
 
-        print("Ihr gesammt Wert ist " + self.gesammt_wert)
+        print("Ihr gesammt Wert ist " + str(self.gesammt_wert))
 
 
     def weitere_karte(self):
@@ -107,22 +114,22 @@ class Konsolenspieler(Spieler):
             noch_genug_geld = self.geld_setzen(erhöhungs_wert)
 
             if noch_genug_geld:
-                print("Ihr Einsatz ist: " + self.einsatz_momentan)
+                print("Ihr Einsatz ist: " + str(self.einsatz_momentan))
 
             else:
-                print("Sie haben nicht genug Geld. Ihr verfügbares Geld ist: " + self.geld)
-                erhöhungs_wert = input("Wählen sie einen neuen Betrag: ")
+                print("Sie haben nicht genug Geld. Ihr verfügbares Geld ist: " + str(self.geld))
+                erhöhungs_wert = int(input("Wählen sie einen neuen Betrag: "))
 
 
     def bekomme_geld(self, gewinn):
 
         super().bekomme_geld(gewinn)
-        print("Sie haben " + gewinn + " erhalten. Ihr neues Total ist " + self.geld)
+        print("Sie haben " + str(gewinn) + " erhalten. Ihr neues Total ist " + str(self.geld))
 
     def dealer_bekommt_karte(self, dealer_wert):
 
         self.kartenwert_bankier = dealer_wert
-        print("Der Dealer hat eine " + self.kartenwert_bankier)
+        print("Der Dealer hat eine " + str(self.kartenwert_bankier))
 
     def pleite(self):
         print("Sie haben kein Geld mehr und sind somit ausgeschieden.")
@@ -144,11 +151,9 @@ class Dealer(Spieler):
         self.gesammt_wert = self.gesammt_wert + wert
 
     def weitere_karte(self):
+        return self.gesammt_wert < 17
 
-        if self.gesammt_wert < 17:
-            return True
-        else:
-            return False
+
 
     def erhoehen(self):
         print("Fehler: Dealer hat keinen Einsatz")

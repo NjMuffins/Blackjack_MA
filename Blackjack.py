@@ -11,13 +11,15 @@ class Computer:
 
     gewinn_faktor = 0
 
+    misch_limit = 0
+
     alle_spieler = []
 
     dealer = None
 
     start_einsatz = 0
 
-    def __init__(self, dealer, gewinn_faktor, alle_spieler, start_einsatz):
+    def __init__(self, dealer, gewinn_faktor, alle_spieler, start_einsatz, misch_limit):
 
         self.dealer = dealer
 
@@ -27,13 +29,33 @@ class Computer:
 
         self.start_einsatz = start_einsatz
 
+        self.misch_limit = misch_limit
+
+
+
+    def gib_karte(self, spieler):
+
+        index = random.randint(0, len(self.momentane_karten) - 1)
+
+        karte = self.momentane_karten[index]
+
+        del self.momentane_karten[index]
+
+        spieler.bekomme_karte(karte)
+
+        return karte
+
+
+
+
 
     def ein_spiel(self):
+
+
         #Alle Spieler setzen den start einsatz. Wenn zu wenig Geld sind sie ausgeschieden
         for spieler in self.alle_spieler:
-            spieler.geld_setzen(self.start_einsatz)
 
-            if not spieler.geld_setzen(self.start_einsatz):
+            if not spieler.neues_spiel(self.start_einsatz):
                 spieler.pleite()
 
                 self.alle_spieler.remove(spieler)
@@ -45,37 +67,84 @@ class Computer:
 
         #Alle spieler bekommen 2 Karten
         for spieler in self.alle_spieler:
-            for i in range(0, 2):
+            for i in range(2):
 
-                index = random.randint(0, len(self.momentane_karten) - 1)
+                self.gib_karte(spieler)
 
-                karte = self.momentane_karten[index]
-
-                del self.momentane_karten[index]
-
-                spieler.bekomme_karte(karte)
 
         #Dealer bekommt eine Karte
-        index = random.randint(0, len(self.momentane_karten) - 1)
 
-        karte = self.momentane_karten[index]
-
-        del self.momentane_karten[index]
-
-        self.dealer.bekomme_karte(karte)
+        dealer_karte = self.gib_karte(self.dealer)
 
         #Spieler erfahren die erste Karte des Dealers
         for spieler in self.alle_spieler:
-            spieler.dealer_bekommt_karte(karte)
+            spieler.dealer_bekommt_karte(dealer_karte)
 
         #Dealer bekommt die zweite Karte
-        index = random.randint(0, len(self.momentane_karten) - 1)
+        self.gib_karte(self.dealer)
 
-        karte = self.momentane_karten[index]
+        #Spieler setzen ihr Geld
+        for spieler in self.alle_spieler:
+            spieler.erhoehen()
 
-        del self.momentane_karten[index]
 
-        self.dealer.bekomme_karte(karte)
+        #Weitere Karten ziehen
+        for spieler in self.alle_spieler:
+            will_weitere_karte = True
+
+            while will_weitere_karte:
+                if spieler.weitere_karte():
+                    self.gib_karte(spieler)
+
+                else:
+                    will_weitere_karte = False
+
+                if spieler.ausgeschieden():
+                    will_weitere_karte = False
+
+        #Dealer zieht weitere Karten
+        while self.dealer.weitere_karte():
+            self.gib_karte(self.dealer)
+
+
+        print("debug: dealer karten wert: " + str(self.dealer.gesammt_wert))
+        #Schaut ob Dealer oder der Spieler gewonnen hat
+        for spieler in self.alle_spieler:
+            if spieler.gesammt_wert < self.dealer.gesammt_wert < 22 or spieler.gesammt_wert > 22:
+                spieler.bekomme_geld(0)
+
+
+            elif self.dealer.gesammt_wert == spieler.gesammt_wert:
+                spieler.bekomme_geld(spieler.einsatz_momentan)
+
+            else:
+                spieler.bekomme_geld(self.gewinn_faktor * spieler.einsatz_momentan)
+
+
+
+
+
+    def n_spiele(self, n):
+
+        for i in range(n):
+            if len(self.momentane_karten) < self.misch_limit:
+
+                self.momentane_karten = []
+
+                for i in range(6):
+                    self.momentane_karten.extend(self.karten_eines_deckes)
+
+
+
+            self.ein_spiel()
+
+
+
+
+
+
+
+
 
 
 
