@@ -4,7 +4,7 @@ from Blackjack import *
 dealer = Dealer(0)
 
 alle_spieler = [
-    Konsolenspieler(100)
+    Konsolenspieler(1000)
 ]
 
 gewinn_faktor = 2
@@ -15,4 +15,4 @@ start_einsatz = 5
 
 computer = Computer(dealer, gewinn_faktor, alle_spieler, start_einsatz, misch_limit)
 
-computer.n_spiele(10)
+computer.n_spiele(1000)

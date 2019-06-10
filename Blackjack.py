@@ -108,6 +108,7 @@ class Computer:
 
 
         print("debug: dealer karten wert: " + str(self.dealer.gesammt_wert))
+
         #Schaut ob Dealer oder der Spieler gewonnen hat
         for spieler in self.alle_spieler:
             if spieler.gesammt_wert < self.dealer.gesammt_wert < 22 or spieler.gesammt_wert > 22:

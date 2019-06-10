@@ -67,6 +67,10 @@ class Konsolenspieler(Spieler):
 
     def neues_spiel(self, start_einsatz):
 
+        print("------------------------------------------------------------------")
+        print("")
+        print("------------------------------------------------------------------")
+
         self.gesammt_wert = 0
 
         self.verloren = False
@@ -85,7 +89,7 @@ class Konsolenspieler(Spieler):
 
         self.gesammt_wert = self.gesammt_wert + wert
 
-        print("Ihr gesammt Wert ist " + str(self.gesammt_wert))
+        print("Ihr gesammt Wert ist " + str(self.gesammt_wert) + "\n")
 
 
     def weitere_karte(self):
@@ -104,7 +108,7 @@ class Konsolenspieler(Spieler):
             neue_karte_bekommen = input("Keine valide Antwort. Geben sie Ja/Nein ein.")
 
 
-
+    #TODO: Kann negative Zahl eingeben und absichtlich verlieren
     def erhoehen(self):
         erhöhungs_wert = int(input("Um wieviel wollen sie den Einsatz erhöhen?"))
         noch_genug_geld = False
@@ -114,7 +118,7 @@ class Konsolenspieler(Spieler):
             noch_genug_geld = self.geld_setzen(erhöhungs_wert)
 
             if noch_genug_geld:
-                print("Ihr Einsatz ist: " + str(self.einsatz_momentan))
+                print("Ihr Einsatz ist: " + str(self.einsatz_momentan) + "\n")
 
             else:
                 print("Sie haben nicht genug Geld. Ihr verfügbares Geld ist: " + str(self.geld))
@@ -129,7 +133,7 @@ class Konsolenspieler(Spieler):
     def dealer_bekommt_karte(self, dealer_wert):
 
         self.kartenwert_bankier = dealer_wert
-        print("Der Dealer hat eine " + str(self.kartenwert_bankier))
+        print("Der Dealer hat eine " + str(self.kartenwert_bankier) + "\n")
 
     def pleite(self):
         print("Sie haben kein Geld mehr und sind somit ausgeschieden.")
