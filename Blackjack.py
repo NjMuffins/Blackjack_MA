@@ -15,6 +15,8 @@ class Computer:
 
     alle_spieler = []
 
+    geister_spieler = []
+
     dealer = None
 
     start_einsatz = 0
@@ -31,7 +33,15 @@ class Computer:
 
         self.misch_limit = misch_limit
 
+        for spieler in self.alle_spieler:
+            spieler.definiere_computer(self)
 
+    def zusaetzlicher_spieler(self, geist, aktueller_spieler):
+        self.alle_spieler.append(geist)
+        self.geister_spieler.append(geist)
+        self.geister_spieler.append(aktueller_spieler)
+        self.gib_karte(geist)
+        self.gib_karte(aktueller_spieler)
 
     def gib_karte(self, spieler):
 
@@ -55,7 +65,7 @@ class Computer:
         #Alle Spieler setzen den start einsatz. Wenn zu wenig Geld sind sie ausgeschieden
         for spieler in self.alle_spieler:
 
-            if not spieler.neues_spiel(self.start_einsatz):
+            if not spieler.neues_spiel(self.start_einsatz, self.momentane_karten):
                 spieler.pleite()
 
                 self.alle_spieler.remove(spieler)
@@ -64,6 +74,8 @@ class Computer:
         #Überprüft ob noch spieler vorhanden sind
         if len(self.alle_spieler) == 0:
             return True
+
+        self.dealer.neues_spiel(0, self.momentane_karten)
 
         #Alle spieler bekommen 2 Karten
         for spieler in self.alle_spieler:
@@ -102,9 +114,14 @@ class Computer:
                 if spieler.ausgeschieden():
                     will_weitere_karte = False
 
+                if spieler.hat_double_down:
+                    will_weitere_karte = False
+
         #Dealer zieht weitere Karten
         while self.dealer.weitere_karte():
             self.gib_karte(self.dealer)
+
+
 
 
         print("debug: dealer karten wert: " + str(self.dealer.gesammt_wert))
@@ -121,6 +138,19 @@ class Computer:
             else:
                 spieler.bekomme_geld(self.gewinn_faktor * spieler.einsatz_momentan)
 
+        i = 0
+        while i > len(self.geister_spieler):
+            self.geister_spieler[i + 1].bekomme_geld(self.geister_spieler[i].geld)
+            self.alle_spieler.remove(self.geister_spieler[i])
+            i = i + 2
+
+        self.geister_spieler = []
+
+
+
+
+
+
 
 
 
@@ -134,8 +164,6 @@ class Computer:
 
                 for i in range(6):
                     self.momentane_karten.extend(self.karten_eines_deckes)
-
-
 
             self.ein_spiel()
 

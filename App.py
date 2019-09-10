@@ -4,7 +4,7 @@ from Blackjack import *
 dealer = Dealer(0)
 
 alle_spieler = [
-    Konsolenspieler(1000)
+    HiLoSpieler(1000)
 ]
 
 gewinn_faktor = 2
