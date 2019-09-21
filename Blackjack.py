@@ -4,9 +4,9 @@ import random
 
 
 class Computer:
-
+    #TODO: Alles Attribute einzeln kommentieren (überall)
+    #Speichern der Karten
     karten_eines_deckes = (2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11)
-
     momentane_karten = []
 
     gewinn_faktor = 0
@@ -20,6 +20,7 @@ class Computer:
     dealer = None
 
     start_einsatz = 0
+
 
     def __init__(self, dealer, gewinn_faktor, alle_spieler, start_einsatz, misch_limit):
 
@@ -54,8 +55,8 @@ class Computer:
         spieler.bekomme_karte(karte)
 
         return karte
-
-
+        #spieler.bekomme_karte(4)
+        #return 4
 
 
 
@@ -138,6 +139,8 @@ class Computer:
             else:
                 spieler.bekomme_geld(self.gewinn_faktor * spieler.einsatz_momentan)
 
+                spieler.totale_siege = spieler.totale_siege + 1
+
         i = 0
         while i > len(self.geister_spieler):
             self.geister_spieler[i + 1].bekomme_geld(self.geister_spieler[i].geld)
@@ -166,6 +169,10 @@ class Computer:
                     self.momentane_karten.extend(self.karten_eines_deckes)
 
             self.ein_spiel()
+
+        for spieler in self.alle_spieler:
+            print(spieler.name + " hat " + str(spieler.totale_siege) + " Siege in " + str(n) + " Spielen.")
+            print(spieler.name + " hat insgesamt " + str(spieler.geld) + " Franken")
 
 
 

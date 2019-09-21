@@ -7,6 +7,8 @@ import random
 
 class Spieler:
 
+    name = ""
+
     hat_double_down = False
 
     hat_split = False
@@ -25,8 +27,11 @@ class Spieler:
 
     kartenwert_bankier = 0
 
-    def __init__(self, geld):
+    totale_siege = 0
+
+    def __init__(self, geld, name):
         self.geld = geld
+        self.name = name
 
 
 
@@ -82,17 +87,22 @@ class Spieler:
 
 
 
-    #HiLoSpieler = 1
+    #HiLoSpieler = 1, Konsolenspieler = 2
     def split_hand(self, welcher_spieler):
 
         self.hat_split = True
 
         if welcher_spieler == 1:
-            geist = HiLoSpieler(max(self.einsatz_momentan * 2, self.geld))
+            geist = HiLoSpieler(max(self.einsatz_momentan * 2, self.geld), self.name + "-geist")
+
+        elif welcher_spieler == 2:
+
+            geist = Konsolenspieler(max(self.einsatz_momentan * 2, self.geld), self.name + "-geist")
 
         geist.bekomme_karte(self.gesammt_wert / 2)
         geist.hat_split = True
         self.gesammt_wert = self.gesammt_wert / 2
+        print("Debug")
         self.computer.zusaetzlicher_spieler(geist, self)
 
 
@@ -154,6 +164,13 @@ class Konsolenspieler(Spieler):
                 return True
 
             elif neue_karte_bekommen == "nein":
+                return False
+
+            elif neue_karte_bekommen == "dd":
+                return self.double_down()
+
+            elif neue_karte_bekommen == "sh":
+                self.split_hand(2)
                 return False
 
             neue_karte_bekommen = input("Keine valide Antwort. Geben sie Ja/Nein ein.")
@@ -283,6 +300,12 @@ class HiLoSpieler(Spieler):
         return hat_genug_geld
 
     def bekomme_karte(self, wert):
+
+        if self.karte_1 == 0:
+            self.karte_1 = wert
+        elif self.karte_2 == 0:
+            self.karte_2 = wert
+
         if wert > 9:
             self.running_count = self.running_count - 1
 
@@ -305,6 +328,7 @@ class HiLoSpieler(Spieler):
 
 
     def weitere_karte(self):
+
 
 
         if self.karte_1 == self.karte_2 and not self.karte_1 == 5 and not self.karte_1 == 10 and not self.hat_split:

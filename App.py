@@ -1,10 +1,11 @@
 from Spieler import *
 from Blackjack import *
 
-dealer = Dealer(0)
+dealer = Dealer(0, "Dealer")
 
 alle_spieler = [
-    HiLoSpieler(1000)
+    #HiLoSpieler(1000, "HiLoSpieler")
+    Konsolenspieler(1000, "Noah")
 ]
 
 gewinn_faktor = 2
