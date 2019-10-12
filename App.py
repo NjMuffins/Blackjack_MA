@@ -4,8 +4,10 @@ from Blackjack import *
 dealer = Dealer(0, "Dealer")
 
 alle_spieler = [
-    #HiLoSpieler(1000, "HiLoSpieler")
-    Konsolenspieler(1000, "Noah")
+    #HiLoSpieler(10000, "HiLoSpieler"),
+    #Konsolenspieler(10000, "Noah")
+    #BasicStrategySpieler(10000, "BasicStrategySpieler"),
+    Wahrscheinlichkeits_Spieler(10000, "Wahrscheinlichkeitsspieler")
 ]
 
 gewinn_faktor = 2

@@ -37,12 +37,6 @@ class Computer:
         for spieler in self.alle_spieler:
             spieler.definiere_computer(self)
 
-    def zusaetzlicher_spieler(self, geist, aktueller_spieler):
-        self.alle_spieler.append(geist)
-        self.geister_spieler.append(geist)
-        self.geister_spieler.append(aktueller_spieler)
-        self.gib_karte(geist)
-        self.gib_karte(aktueller_spieler)
 
     def gib_karte(self, spieler):
 
@@ -125,11 +119,12 @@ class Computer:
 
 
 
-        print("debug: dealer karten wert: " + str(self.dealer.gesammt_wert))
+        #print("debug: dealer karten wert: " + str(self.dealer.gesammt_wert))
+
 
         #Schaut ob Dealer oder der Spieler gewonnen hat
         for spieler in self.alle_spieler:
-            if spieler.gesammt_wert < self.dealer.gesammt_wert < 22 or spieler.gesammt_wert > 22:
+            if spieler.gesammt_wert < self.dealer.gesammt_wert < 22 or spieler.gesammt_wert > 21:
                 spieler.bekomme_geld(0)
 
 
@@ -140,21 +135,6 @@ class Computer:
                 spieler.bekomme_geld(self.gewinn_faktor * spieler.einsatz_momentan)
 
                 spieler.totale_siege = spieler.totale_siege + 1
-
-        i = 0
-        while i > len(self.geister_spieler):
-            self.geister_spieler[i + 1].bekomme_geld(self.geister_spieler[i].geld)
-            self.alle_spieler.remove(self.geister_spieler[i])
-            i = i + 2
-
-        self.geister_spieler = []
-
-
-
-
-
-
-
 
 
 

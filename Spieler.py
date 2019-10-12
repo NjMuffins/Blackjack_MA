@@ -87,30 +87,6 @@ class Spieler:
 
 
 
-    #HiLoSpieler = 1, Konsolenspieler = 2
-    def split_hand(self, welcher_spieler):
-
-        self.hat_split = True
-
-        if welcher_spieler == 1:
-            geist = HiLoSpieler(max(self.einsatz_momentan * 2, self.geld), self.name + "-geist")
-
-        elif welcher_spieler == 2:
-
-            geist = Konsolenspieler(max(self.einsatz_momentan * 2, self.geld), self.name + "-geist")
-
-        geist.bekomme_karte(self.gesammt_wert / 2)
-        geist.hat_split = True
-        self.gesammt_wert = self.gesammt_wert / 2
-        print("Debug")
-        self.computer.zusaetzlicher_spieler(geist, self)
-
-
-
-
-
-
-
 class Konsolenspieler(Spieler):
 
     def neues_spiel(self, start_einsatz, momentane_karten):
@@ -168,10 +144,6 @@ class Konsolenspieler(Spieler):
 
             elif neue_karte_bekommen == "dd":
                 return self.double_down()
-
-            elif neue_karte_bekommen == "sh":
-                self.split_hand(2)
-                return False
 
             neue_karte_bekommen = input("Keine valide Antwort. Geben sie Ja/Nein ein.")
 
@@ -283,7 +255,7 @@ class HiLoSpieler(Spieler):
 
         self.gesammt_wert = 0
 
-        self.einsatz_unit = self.geld / 1000
+        self.einsatz_unit = self.geld / 10000
 
         self.ass_zaehler = 0
 
@@ -331,54 +303,9 @@ class HiLoSpieler(Spieler):
 
 
 
-        if self.karte_1 == self.karte_2 and not self.karte_1 == 5 and not self.karte_1 == 10 and not self.hat_split:
 
-            if self.karte_1 == 7 or self.karte_1 == 3 or self.karte_1 == 2:
 
-                if self.kartenwert_bankier < 8:
-
-                    self.split_hand(1)
-
-                else:
-
-                    return True
-
-            elif self.karte_1 == 4:
-
-                if self.kartenwert_bankier < 5 or self.kartenwert_bankier > 6:
-
-                    return True
-
-                else:
-
-                    self.split_hand(1)
-
-            elif self.karte_1 == 6:
-
-                if self.kartenwert_bankier < 7:
-
-                    self.split_hand(1)
-
-                else:
-
-                    return True
-
-            elif self.karte_1 == 8 or self.karte_1 == 11:
-
-                self.split_hand(1)
-
-            #self.karte_1 == 9
-            else:
-
-                if self.kartenwert_bankier == 7 or self.kartenwert_bankier == 10 or self.kartenwert_bankier == 11:
-
-                    return False
-
-                else:
-
-                    self.split_hand(1)
-
-        elif self.ass_zaehler > 0 or self.karte_1 == 10 and self.karte_2 == 10:
+        if self.ass_zaehler > 0 or self.karte_1 == 10 and self.karte_2 == 10:
 
             if self.gesammt_wert > 18:
 
@@ -529,6 +456,410 @@ class HiLoSpieler(Spieler):
     def pleite(self):
 
         print("HiLoSpieler ist ausgeschieden")
+
+
+
+
+
+
+class Wahrscheinlichkeits_Spieler(Spieler):
+
+    karte_1 = 0
+
+    karte_2 = 0
+
+
+    uebrige_karten = []
+
+
+    def neues_spiel(self, start_einsatz, momentane_karten):
+        self.hat_double_down = False
+
+        self.gesammt_wert = 0
+
+        self.ass_zaehler = 0
+
+        self.verloren = False
+
+        self.uebrige_karten = momentane_karten
+
+        self.einsatz_momentan = 0
+
+        self.kartenwert_bankier = 0
+
+        hat_genug_geld = self.geld_setzen(start_einsatz)
+
+        return hat_genug_geld
+
+
+    def bekomme_karte(self, wert):
+
+        if wert == 11:
+            self.ass_zaehler = self.ass_zaehler + 1
+
+        self.gesammt_wert = self.gesammt_wert + wert
+
+        while self.gesammt_wert > 21 and self.ass_zaehler > 0:
+            self.gesammt_wert = self.gesammt_wert - 10
+            self.ass_zaehler = self.ass_zaehler - 1
+
+
+    def weitere_karte(self):
+
+        wie_oft = []
+        for h in range(12):
+            wie_oft.append(0)
+
+        for i in self.uebrige_karten:
+            wie_oft[i - 1] = wie_oft[i - 1] + 1
+
+        for i in range(len(wie_oft)):
+            wie_oft[i - 1] = wie_oft[i - 1] / len(self.uebrige_karten)
+
+        #print("Debug wie_oft: " + str(wie_oft))
+
+        differenz = 21 - self.gesammt_wert
+
+        if differenz >= 11:
+            return True
+
+        wkeit_true = 0
+        counter = 0
+        while counter <= differenz:
+            wkeit_true = wkeit_true + wie_oft[counter]
+            counter = counter + 1
+
+        return wkeit_true > 0.5
+
+
+
+
+
+
+
+    def erhoehen(self):
+
+        wkeit_spieler_total = 0
+
+        wkeit_sieg_spieler = 0
+
+        wie_oft = []
+
+        wkeit_spieler = []
+
+        wkeit_dealer = []
+
+        for i in range(22):
+            wkeit_dealer.append(0)
+
+
+        for i in range(12):
+            wie_oft.append(0)
+
+
+        for i in self.uebrige_karten:
+            wie_oft[i] = wie_oft[i] + 1
+
+
+        for i in range(len(wie_oft)):
+            wie_oft[i] = wie_oft[i] / len(self.uebrige_karten)
+
+
+        for i in range(len(wie_oft)):
+
+            if self.kartenwert_bankier + i > 21:
+                wkeit_dealer[21] = wkeit_dealer[21] + wie_oft[i]
+
+            else:
+
+                wkeit_dealer[self.kartenwert_bankier + i - 1] = wkeit_dealer[self.kartenwert_bankier + i - 1] + wie_oft[i]
+
+        for i in range(17):
+            for j in range(len(wie_oft)):
+                if i + j > 21:
+                    wkeit_dealer[21] = wkeit_dealer[21] + wkeit_dealer[i] * wie_oft[j]
+
+                else:
+
+                    wkeit_dealer[i + j] = wkeit_dealer[i + j] + wkeit_dealer[i] * wie_oft[j]
+
+        #print("Debug wkeit_dealer: " + str(wkeit_dealer))
+
+
+
+
+
+
+        for i in range(22):
+            wkeit_spieler.append(0)
+
+
+        for i in range(len(wie_oft)):
+
+            if self.gesammt_wert + i > 21:
+                wkeit_spieler[21] = wkeit_spieler[21] + wie_oft[i]
+
+            else:
+
+                wkeit_spieler[self.gesammt_wert + i - 1] = wkeit_spieler[self.gesammt_wert + i - 1] + wie_oft[i]
+
+        for i in range(17):
+            for j in range(len(wie_oft)):
+                if i + j > 21:
+                    wkeit_spieler[21] = wkeit_spieler[21] + wkeit_spieler[i] * wie_oft[j]
+
+                else:
+
+                    wkeit_spieler[i + j] = wkeit_spieler[i + j] + wkeit_spieler[i] * wie_oft[j]
+
+        n = 16
+        while n < 22:
+
+            wkeit_spieler_total = wkeit_spieler_total + wkeit_spieler[n]
+
+            n = n + 1
+
+        #print("Debug wkeit_spieler: " + str(wkeit_spieler))
+
+
+        wkeit_sieg_spieler = wkeit_sieg_spieler + wkeit_dealer[16] * (wkeit_spieler[17] + wkeit_spieler[18] + wkeit_spieler[19] + wkeit_spieler[20]) + wkeit_dealer[17] * (wkeit_spieler[18] + wkeit_spieler[19] + wkeit_spieler[20] + wkeit_dealer[18]) * (wkeit_spieler[19] + wkeit_spieler[20]) + wkeit_dealer[19] * wkeit_spieler[20] + wkeit_dealer[21] * (wkeit_spieler_total - wkeit_spieler[21])
+        #print("Debug wkeit_siege_spieler: " + str(wkeit_sieg_spieler))
+        if wkeit_sieg_spieler < 0.25:
+
+            self.geld_setzen(0)
+
+
+        else:
+            if wkeit_sieg_spieler < 0.50:
+                self.geld_setzen(0)
+
+            elif wkeit_sieg_spieler < 0.75:
+                self.geld_setzen(self.einsatz_momentan * 5)
+
+            else:
+                self.geld_setzen(self.einsatz_momentan * 10)
+
+
+
+
+
+    def bekomme_geld(self, gewinn):
+        super().bekomme_geld(gewinn)
+
+
+
+    def dealer_bekommt_karte(self, dealer_wert):
+        self.kartenwert_bankier = dealer_wert
+
+
+    def pleite(self):
+        print("WahrscheinlichkeitsSpieler ist ausgeschieden")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class BasicStrategySpieler(Spieler):
+
+
+    karte_1 = 0
+
+    karte_2 = 0
+
+    uebrige_karten = []
+
+    def neues_spiel(self, start_einsatz, momentane_karten):
+
+        self.hat_double_down = False
+
+
+        self.gesammt_wert = 0
+
+        self.ass_zaehler = 0
+
+        self.verloren = False
+
+        self.uebrige_karten = momentane_karten
+
+        self.einsatz_momentan = 0
+
+        self.kartenwert_bankier = 0
+
+        hat_genug_geld = self.geld_setzen(start_einsatz)
+
+        return hat_genug_geld
+
+    def bekomme_karte(self, wert):
+
+        if self.karte_1 == 0:
+            self.karte_1 = wert
+        elif self.karte_2 == 0:
+            self.karte_2 = wert
+
+
+        if wert == 11:
+            self.ass_zaehler = self.ass_zaehler + 1
+
+        self.gesammt_wert = self.gesammt_wert + wert
+
+        while self.gesammt_wert > 21 and self.ass_zaehler > 0:
+            self.gesammt_wert = self.gesammt_wert - 10
+            self.ass_zaehler = self.ass_zaehler - 1
+
+
+    def weitere_karte(self):
+
+
+
+
+
+        if self.ass_zaehler > 0 or self.karte_1 == 10 and self.karte_2 == 10:
+
+            if self.gesammt_wert > 18:
+
+                return False
+
+
+            elif self.gesammt_wert == 13 or self.gesammt_wert == 14:
+
+                if self.kartenwert_bankier < 5 or self.kartenwert_bankier > 6:
+
+                    return True
+
+                else:
+
+                    return self.double_down()
+
+            elif self.gesammt_wert == 15 or self.gesammt_wert == 16:
+
+                if self.kartenwert_bankier < 4 or self.kartenwert_bankier > 6:
+
+                    return True
+
+                else:
+
+                    return self.double_down()
+
+            elif self.gesammt_wert == 17:
+
+                if self.kartenwert_bankier < 3 or self.kartenwert_bankier > 6:
+
+                    return True
+
+                else:
+
+                    return self.double_down()
+
+            #self.karte_1 == 18
+            else:
+
+                if self.kartenwert_bankier < 9:
+
+                    return False
+
+                else:
+
+                    return True
+
+        #self.ass_counter < 1 and not self.karte_1 == self.karte_2
+        else:
+
+            if self.gesammt_wert < 9:
+
+                return True
+
+            elif self.gesammt_wert == 9:
+
+                if self.kartenwert_bankier < 3 or self.kartenwert_bankier > 6:
+
+                    return True
+
+                else:
+
+                    return self.double_down()
+
+            elif self.gesammt_wert == 10:
+
+                if self.kartenwert_bankier > 10:
+
+                    return True
+
+                else:
+
+                    return self.double_down()
+
+            elif self.gesammt_wert == 11:
+
+                if not self.kartenwert_bankier == 11:
+
+                    return self.double_down()
+
+                else:
+
+                    return True
+
+            elif self.gesammt_wert == 12:
+
+                if self.kartenwert_bankier < 4 or self.kartenwert_bankier > 6:
+
+                    return True
+
+                else:
+
+                    return False
+
+            elif self.gesammt_wert < 17:
+
+                if self.kartenwert_bankier > 6:
+
+                    return True
+
+                else:
+
+                    return False
+
+            else:
+
+                return False
+
+
+
+
+
+
+    def erhoehen(self):
+
+        self.geld_setzen(0)
+
+
+
+    def bekomme_geld(self, gewinn):
+
+        super().bekomme_geld(gewinn)
+
+
+    def dealer_bekommt_karte(self, dealer_wert):
+
+        self.kartenwert_bankier = dealer_wert
+
+
+
+
+    def pleite(self):
+
+        print("BasicStrategySpieler ist ausgeschieden")
+
+
+
 
 
 
